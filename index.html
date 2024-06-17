@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        pre {
+            text-align: center;
+            white-space: pre-wrap; /* Wrap text in <pre> to handle long lines */
+        }
+        .center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <pre id="logo" class="center"></pre>
+    <p>I'm thinking of a number between 1 and 100.</p>
+    <label for="level">Choose a level:</label>
+    <select id="level">
+        <option value="e">Easy</option>
+        <option value="h">Hard</option>
+    </select>
+    <button onclick="startGame()">Start Game</button>
+
+    <div id="game" class="hidden">
+        <p id="attempts"></p>
+        <label for="guess">Make a Guess:</label>
+        <input type="number" id="guess" min="1" max="100">
+        <button onclick="makeGuess()">Submit</button>
+        <p id="message"></p>
+    </div>
+    <div id="endgame" class="hidden">
+        <pre id="result" class="center"></pre>
+        <button onclick="restartGame()">Play Again</button>
+    </div>
+
+    <script>
+        let randomNumber, attemptsLeft;
+        const asciiArt = {
+            logo: `
+     __                 _                   ___                     _                                          
+  /\\ \\ \\_   _ _ __ ___ | |__   ___ _ __    / _ \\_   _  ___  ___ ___(_)_ __   __ _    __ _  __ _ _ __ ___   ___ 
+ /  \\/ / | | | '_ \` _ \\| '_ \\ / _ \\ '__|  / /_\\/ | | |/ _ \\/ __/ __| | '_ \\ / _\` |  / _\` |/ _\` | '_ \` _ \\ / _ \\
+/ /\\  /| |_| | | | | | | |_) |  __/ |    / /_\\\\| |_| |  __/\\__ \\__ \\ | | | | (_| | | (_| | (_| | | | | | |  __/
+\\_\\ \\/  \\__,_|_| |_| |_|_.__/ \\___|_|    \\____/ \\__,_|\\___||___/___/_|_| |_|\\__, |  \\__, |\\__,_|_| |_| |_|\\___|
+                                                                            |___/   |___/                      
+            `,
+            won: `
+                   __    __              _ 
+/\\_/\\___  _   _   / / /\\ \\ \\___  _ __   / \\
+\\_ _/ _ \\| | | |  \\ \\/  \\/ / _ \\| '_ \\ /  /
+ / \\ (_) | |_| |   \\  /\\  / (_) | | | /\\_/ 
+ \\_/\\___/ \\__,_|    \\/  \\/ \\___/|_| |_\\/   
+                                           
+            `,
+            loose: `
+                     __                        _ 
+/\\_/\\___  _   _     / /  ___   ___  ___  ___  / \\
+\\_ _/ _ \\| | | |   / /  / _ \\ / _ \\/ __|/ _ \\/  /
+ / \\ (_) | |_| |  / /__| (_) | (_) \\__ \\  __/\\_/ 
+ \\_/\\___/ \\__,_|  \\____/\\___/ \\___/|___/\\___\\/  
+            `
+        };
+
+        document.getElementById("logo").innerText = asciiArt.logo;
+
+        function startGame() {
+            const level = document.getElementById("level").value;
+            randomNumber = Math.floor(Math.random() * 100) + 1;
+            attemptsLeft = level === 'e' ? 10 : 5;
+
+            document.getElementById("attempts").innerText = `You have ${attemptsLeft} attempts remaining.`;
+            document.getElementById("game").classList.remove("hidden");
+            document.getElementById("endgame").classList.add("hidden");
+            document.getElementById("message").innerText = '';
+        }
+
+        function makeGuess() {
+            const guessInput = document.getElementById("guess");
+            const guess = parseInt(guessInput.value);
+            guessInput.value = ''; // Clear the input box after submitting
+
+            if (isNaN(guess) || guess < 1 || guess > 100) {
+                document.getElementById("message").innerText = "Kindly choose a number between 1 and 100.";
+                return;
+            }
+
+            attemptsLeft--;
+
+            if (guess === randomNumber) {
+                document.getElementById("result").innerText = asciiArt.won;
+                endGame();
+            } else if (guess > randomNumber) {
+                document.getElementById("message").innerText = "Too High. Guess again.";
+            } else {
+                document.getElementById("message").innerText = "Too Low. Guess again.";
+            }
+
+            document.getElementById("attempts").innerText = `You have ${attemptsLeft} attempts remaining.`;
+
+            if (attemptsLeft === 0) {
+                document.getElementById("result").innerText = asciiArt.loose;
+                endGame();
+            }
+        }
+
+        function endGame() {
+            document.getElementById("game").classList.add("hidden");
+            document.getElementById("endgame").classList.remove("hidden");
+        }
+
+        function restartGame() {
+            startGame();
+        }
+    </script>
+</body>
+</html>
